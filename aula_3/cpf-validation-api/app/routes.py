@@ -5,6 +5,8 @@ from app.validators import is_valid_cpf, get_cpf_info
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
+MAX_BATCH_SIZE = 1000
+
 
 @bp.route('/health', methods=['GET'])
 def health_check():
@@ -111,6 +113,11 @@ def validate_batch():
     if not isinstance(cpfs, list):
         return jsonify({
             'error': 'cpfs must be a list'
+        }), 400
+
+    if len(cpfs) > MAX_BATCH_SIZE:
+        return jsonify({
+            'error': f'Batch size exceeds maximum of {MAX_BATCH_SIZE} CPFs'
         }), 400
     
     results = []
